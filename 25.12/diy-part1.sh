@@ -37,6 +37,9 @@ git clone --depth=1 https://github.com/QiuSimons/luci-app-honk.git package/custo
 
 git clone --depth=1 -b kix https://github.com/QiuSimons/luci-app-daed.git package/custom/daed
 # git clone --depth=1 -b master https://github.com/QiuSimons/luci-app-daed.git package/custom/daed
+
+#homeproxy
+git clone --depth=1 https://github.com/VIKINGYFY/packages.git package/custom/luci-app-homeproxy
 # 添加 vmlinux-btf 模块
 git clone --depth=1 https://github.com/QiuSimons/vmlinux-btf.git package/custom/vmlinux-btf
 
