@@ -6,9 +6,7 @@ env:
   REPO_BRANCH: 25.12
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: 25.12/mt7986-clx-s20p.config
-  DIY_P1_SH: 25.12/diy-part1.sh
-  DIY_P2_SH: 25.12/diy-part2.sh
-  DIY_P3_SH: diy-partX.sh
+  DIY_P1_SH: 25.12/s20p-packages.sh
   UPLOAD_BIN_DIR: true
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -109,6 +107,7 @@ jobs:
     # =========================================================
     - name: Update & install feeds
       run: |
+        if [ -f "$FEEDS_CONF" ]; then cp "$FEEDS_CONF" openwrt/feeds.conf.default; fi
         cd openwrt
         ./scripts/feeds update -a
         ./scripts/feeds install -a
@@ -118,31 +117,14 @@ jobs:
     # =========================================================
     - name: Load custom feeds (diy-part1.sh)
       run: |
-        [ -e "$FEEDS_CONF" ] && cp "$FEEDS_CONF" openwrt/feeds.conf.default
         chmod +x "$DIY_P1_SH"
         cd openwrt
         "$GITHUB_WORKSPACE/$DIY_P1_SH"
 
-    # =========================================================
-    # 5. 加载自定义配置 (diy-part2.sh)
-    # =========================================================
-    - name: Load custom configuration (diy-part2.sh)
+    - name: Load S20P configuration
       run: |
-        [ -e files ] && cp -r files openwrt/files
-        [ -e "$CONFIG_FILE" ] && cp "$CONFIG_FILE" openwrt/.config
-        chmod +x "$DIY_P2_SH"
-        cd openwrt
-        "$GITHUB_WORKSPACE/$DIY_P2_SH"
-
-    # =========================================================
-    # 5.5 加载自定义配置 (diy-part3.sh)
-    # =========================================================
-    - name: Load custom configuration (diy-part3.sh)
-      run: |
-        [ -e "$CONFIG_FILE" ] && cp "$CONFIG_FILE" openwrt/.config
-        chmod +x "$DIY_P3_SH"
-        cd openwrt
-        "$GITHUB_WORKSPACE/$DIY_P3_SH"
+        if [ -d files ]; then cp -r files openwrt/files; fi
+        cp "$CONFIG_FILE" openwrt/.config
 
     # =========================================================
     # 5.6 生成 Toolchain 缓存 Key
@@ -151,7 +133,8 @@ jobs:
       id: cache-key
       run: |
         cd openwrt
-        make defconfig 1>/dev/null 2>&1
+        make defconfig
+        python3 "$GITHUB_WORKSPACE/25.12/check-s20p-config.py" .config
 
         # 提取目标平台
         TARGET=$(grep '^CONFIG_TARGET_BOARD=' .config | cut -d'"' -f2)
@@ -423,7 +406,7 @@ jobs:
     # =========================================================
     - name: Organize files
       id: organize
-      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
         rm -rf packages
@@ -442,7 +425,7 @@ jobs:
     # =========================================================
     - name: Generate release tag
       id: tag
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
         AUTHOR=$(echo "${{ env.REPO_URL }}" | cut -d'/' -f4)
         DEVICE_NAME="${{ env.DEVICE_NAME }}"
