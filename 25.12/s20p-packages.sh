@@ -27,7 +27,9 @@ for feed in pathlib.Path('feeds').iterdir():
     if not feed.is_dir():
         continue
     for path in feed.rglob(name):
-        if path.is_dir() and (path / 'Makefile').is_file():
+        if path.is_symlink():
+            path.unlink()
+        elif path.is_dir() and (path / 'Makefile').is_file():
             shutil.rmtree(path)
 for feed in pathlib.Path('package/feeds').glob('*'):
     path = feed / name
