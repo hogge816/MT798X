@@ -10,7 +10,8 @@ required = {
     'PACKAGE_kmod-warp', 'PACKAGE_kmod-conninfra',
     'MTK_CHIP_MT7986', 'MTK_MT_WIFI_DRIVER_VERSION_7673',
     'PACKAGE_luci-app-mtwifi-cfg', 'PACKAGE_firewall4',
-    'PACKAGE_luci-app-nikki', 'PACKAGE_nikki', 'PACKAGE_mihomo-meta',
+    # nikki 已替换为 nikki-rs（clash-rs 内核）；不再要求旧 nikki/mihomo 链路
+    'PACKAGE_luci-app-nikki-rs', 'PACKAGE_nikki-rs', 'PACKAGE_clash-rs',
     'PACKAGE_luci-app-rtp2httpd', 'PACKAGE_rtp2httpd',
     'PACKAGE_luci-app-ddns-go', 'PACKAGE_ddns-go',
     'PACKAGE_luci-app-homeproxy', 'PACKAGE_sing-box',
@@ -22,6 +23,8 @@ forbidden = {
     'PACKAGE_luci-app-passwall2', 'PACKAGE_mihomo-alpha',
     'PACKAGE_miniupnpd-iptables', 'PACKAGE_luci-theme-argon',
     'PACKAGE_luci-app-argon-config',
+    # 与 nikki-rs 互斥：旧 nikki 链路不得随镜像发布
+    'PACKAGE_luci-app-nikki', 'PACKAGE_nikki', 'PACKAGE_mihomo-meta',
 }
 config = {}
 for line in pathlib.Path(sys.argv[1]).read_text().splitlines():
