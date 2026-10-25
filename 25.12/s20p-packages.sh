@@ -41,11 +41,15 @@ PY
 }
 mkdir -p package/custom
 fetch nikki https://github.com/nikkinikki-org/OpenWrt-nikki.git 31339d53b454f575082dc4e16510c96858e01921
+fetch nikki-rs https://github.com/CHKayanami/OpenWrt-nikki-rs.git 67ffca956c9678675b26dcc9a6237053a9fd8d93
 fetch rtp https://github.com/stackia/rtp2httpd.git 5e53989835c33a68fcb78d60587c861afb2133ca
 fetch ddns https://github.com/sirpdboy/luci-app-ddns-go.git 7092e6de6ad9fe3f7d327f70468dfd19e00d6f0e
 fetch viking https://github.com/VIKINGYFY/packages.git af37004515fff4057d31fe7557748bbee5e293cf
 for name in nikki luci-app-nikki mihomo-meta; do
     install_package "$cache/nikki/$name" "$name"
+done
+for name in nikki-rs luci-app-nikki-rs clash-rs; do
+    install_package "$cache/nikki-rs/$name" "$name"
 done
 for name in rtp2httpd luci-app-rtp2httpd; do
     install_package "$cache/rtp/openwrt-support/$name" "$name"
