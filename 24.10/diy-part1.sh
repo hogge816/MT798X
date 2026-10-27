@@ -27,7 +27,14 @@ git clone --depth=1 -b master https://github.com/vernesong/OpenClash.git package
 # Nikki / Momo
 git clone --depth=1 https://github.com/nikkinikki-org/OpenWrt-nikki.git package/custom/nikki
 
-git clone --depth=1 https://github.com/CHKayanami/OpenWrt-nikki-rs.git package/custom/nikki-rs
+# Nikki-rs / clash-rs（仓库包含三个独立 OpenWrt 包，需展开到 package/custom 顶层）
+NIKKI_RS_SRC="package/custom/.nikki-rs-src"
+rm -rf "$NIKKI_RS_SRC" package/custom/nikki-rs package/custom/luci-app-nikki-rs package/custom/clash-rs
+git clone --depth=1 https://github.com/CHKayanami/OpenWrt-nikki-rs.git "$NIKKI_RS_SRC"
+for pkg in nikki-rs luci-app-nikki-rs clash-rs; do
+  cp -a "$NIKKI_RS_SRC/$pkg" "package/custom/$pkg"
+done
+rm -rf "$NIKKI_RS_SRC"
 
 git clone --depth=1 https://github.com/nikkinikki-org/OpenWrt-momo.git package/custom/momo
 
@@ -37,6 +44,9 @@ git clone --depth=1 https://github.com/QiuSimons/luci-app-honk.git package/custo
 
 git clone --depth=1 -b kix https://github.com/QiuSimons/luci-app-daed.git package/custom/daed
 # git clone --depth=1 -b master https://github.com/QiuSimons/luci-app-daed.git package/custom/daed
+
+#homeproxy
+git clone --depth=1 https://github.com/VIKINGYFY/packages.git package/custom/luci-app-homeproxy
 # 添加 vmlinux-btf 模块
 git clone --depth=1 https://github.com/QiuSimons/vmlinux-btf.git package/custom/vmlinux-btf
 
