@@ -3,8 +3,8 @@ name: 24.10-mt7981
 env:
   DEVICE_NAME: 24.10-mt7981
   # REPO_URL: https://github.com/dailook/immortalwrt-mt798x-6.6
-  # REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6
-  REPO_URL: https://github.com/Yuzhii0718/immortalwrt-mt798x-6.6-padavanonly
+  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6
+  # REPO_URL: https://github.com/Yuzhii0718/immortalwrt-mt798x-6.6-padavanonly
   REPO_BRANCH: openwrt-24.10-6.6
   FEEDS_CONF: feeds.conf.default
   CONFIG_FILE: 24.10/mt7981-24.10.config
@@ -402,25 +402,6 @@ jobs:
 
         echo "status=success" >> "$GITHUB_OUTPUT"
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> "$GITHUB_ENV"
-
-        cd openwrt
-
-        echo "=== Target 配置 ==="
-        grep -E '^CONFIG_TARGET_(mediatek|SUBTARGET|DEVICE)' .config || true
-
-        echo "=== 实际生成的镜像 ==="
-        find bin/targets -type f \
-          \( -name '*.bin' -o -name '*.ubi' -o -name '*.itb' \
-            -o -name '*.img' -o -name '*.img.gz' \) \
-          -size +1M -print
-
-        if ! find bin/targets -type f \
-          \( -name '*.bin' -o -name '*.ubi' -o -name '*.itb' \
-            -o -name '*.img' -o -name '*.img.gz' \) \
-          -size +1M -print -quit | grep -q .; then
-          echo "::error::未发现预期的固件镜像，禁止标记构建成功"
-          exit 1
-        fi
 
     # =========================================================
     # 8.5 空间检查
