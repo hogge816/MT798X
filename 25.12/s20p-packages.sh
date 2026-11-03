@@ -51,6 +51,9 @@ done
 for name in nikki-rs luci-app-nikki-rs clash-rs; do
     install_package "$cache/nikki-rs/$name" "$name"
 done
+# Pin clash-rs to the tested 0.20.24 release after installing upstream packages.
+[[ -f "$script_dir/clash-rs/Makefile" && -f package/custom/clash-rs/Makefile ]]
+cp "$script_dir/clash-rs/Makefile" package/custom/clash-rs/Makefile
 for name in rtp2httpd luci-app-rtp2httpd; do
     install_package "$cache/rtp/openwrt-support/$name" "$name"
     cp "package/custom/$name/Makefile.versioned" "package/custom/$name/Makefile"
@@ -71,6 +74,6 @@ fetch aurora-config https://github.com/eamonxg/luci-app-aurora-config.git "$(git
 install_package "$cache/aurora-config" luci-app-aurora-config
 # Persist package source revisions as a build artifact.
 mkdir -p bin
-for name in nikki rtp ddns viking argon aurora aurora-config; do
+for name in nikki nikki-rs rtp ddns viking argon aurora aurora-config; do
     printf '%s %s\n' "$name" "$(git -C "$cache/$name" rev-parse HEAD)"
 done > bin/s20p-package-revisions.txt

@@ -12,6 +12,9 @@ required = {
     'PACKAGE_luci-app-mtwifi-cfg', 'PACKAGE_firewall4',
     # nikki 已替换为 nikki-rs（clash-rs 内核）；不再要求旧 nikki/mihomo 链路
     'PACKAGE_luci-app-nikki-rs', 'PACKAGE_nikki-rs', 'PACKAGE_clash-rs',
+    # eBPF needs cgroup support, TC classifier and kernel BTF.
+    'KERNEL_CGROUP_BPF', 'KERNEL_BPF_EVENTS', 'KERNEL_DEBUG_INFO_BTF',
+    'PACKAGE_kmod-sched-bpf',
     'PACKAGE_luci-app-rtp2httpd', 'PACKAGE_rtp2httpd',
     'PACKAGE_luci-app-ddns-go', 'PACKAGE_ddns-go',
     'PACKAGE_luci-app-homeproxy', 'PACKAGE_sing-box',

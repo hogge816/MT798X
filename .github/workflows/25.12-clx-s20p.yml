@@ -290,7 +290,7 @@ jobs:
     # 仅首次编译工具链时执行
     # =========================================================
     - name: Save toolchain to Release backup
-      if: steps.toolchain.outputs.need_save_release == 'true'
+      if: steps.toolchain.outputs.need_save_release == 'true' && github.ref == 'refs/heads/main'
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
@@ -381,6 +381,21 @@ jobs:
         df -hT /
         echo "========================================"
 
+        python3 - <<'PY'
+        import glob, tarfile
+        images = glob.glob('bin/targets/mediatek/filogic/*clx_s20p*sysupgrade.bin')
+        if len(images) != 1:
+            raise SystemExit(f'Expected one S20P sysupgrade image, found {images}')
+        with tarfile.open(images[0]) as image:
+            kernels = [entry for entry in image if entry.isfile() and entry.name.endswith('/kernel')]
+            if len(kernels) != 1:
+                raise SystemExit('Expected one kernel in sysupgrade image')
+            size = kernels[0].size
+        print(f'S20P kernel: {size} bytes; partition: 33554432 bytes')
+        if size > 32 * 1024 * 1024:
+            raise SystemExit('Kernel exceeds 32 MiB partition')
+        PY
+
         echo "status=success" >> "$GITHUB_OUTPUT"
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> "$GITHUB_ENV"
 
@@ -425,7 +440,7 @@ jobs:
     # =========================================================
     - name: Generate release tag
       id: tag
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && github.ref == 'refs/heads/main' && !cancelled()
       run: |
         AUTHOR=$(echo "${{ env.REPO_URL }}" | cut -d'/' -f4)
         DEVICE_NAME="${{ env.DEVICE_NAME }}"
@@ -477,6 +492,7 @@ jobs:
     # 13. 清理旧的工作流记录
     # =========================================================
     - name: Delete workflow runs
+      if: github.ref == 'refs/heads/main'
       uses: Mattraks/delete-workflow-runs@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -490,7 +506,7 @@ jobs:
     # =========================================================
     - name: Remove old releases
       uses: dev-drprasad/delete-older-releases@v0.3.4
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      if: env.UPLOAD_RELEASE == 'true' && github.ref == 'refs/heads/main' && !cancelled()
       with:
         keep_latest: 10
         delete_tags: true
