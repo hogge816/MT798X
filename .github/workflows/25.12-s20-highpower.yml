@@ -86,7 +86,9 @@ jobs:
         working-directory: openwrt
         run: |
           cp "$GITHUB_WORKSPACE/$CONFIG_FILE" .config
+          cat "$GITHUB_WORKSPACE/25.12/s20p-highpower.config" >> .config
           make defconfig 2>&1 | tee "$GITHUB_WORKSPACE/defconfig.log"
+          python3 "$GITHUB_WORKSPACE/25.12/check-s20p-power-table.py" source .
           python3 "$GITHUB_WORKSPACE/25.12/check-s20p-highpower.py" config .config "$GITHUB_WORKSPACE/$CONFIG_FILE"
           cp .config "$GITHUB_WORKSPACE/resolved.config"
       - name: SSH connection to Actions
@@ -110,6 +112,7 @@ jobs:
         working-directory: openwrt
         run: |
           python3 "$GITHUB_WORKSPACE/25.12/check-s20p-highpower.py" image bin/targets/mediatek/filogic "$GITHUB_WORKSPACE/$CONFIG_FILE"
+          python3 "$GITHUB_WORKSPACE/25.12/check-s20p-power-table.py" rootfs . | tee "$GITHUB_WORKSPACE/power-table-verification.json"
       - name: Upload build diagnostics
         if: failure()
         uses: actions/upload-artifact@v4
@@ -120,6 +123,7 @@ jobs:
             build.log
             build-retry.log
             resolved.config
+            power-table-verification.json
           if-no-files-found: warn
       - name: Upload firmware
         uses: actions/upload-artifact@v4
@@ -132,6 +136,7 @@ jobs:
             openwrt/bin/targets/mediatek/filogic/sha256sums
             source-revision.txt
             resolved.config
+            power-table-verification.json
           if-no-files-found: error
       - name: Publish firmware
         uses: softprops/action-gh-release@v2
@@ -150,4 +155,5 @@ jobs:
             openwrt/bin/targets/mediatek/filogic/sha256sums
             source-revision.txt
             resolved.config
+            power-table-verification.json
           fail_on_unmatched_files: true
