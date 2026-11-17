@@ -30,6 +30,9 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     timeout-minutes: 355
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -70,6 +73,15 @@ jobs:
           git -C feeds/packages restore lang/golang
           ./scripts/feeds update -i packages
           ./scripts/feeds install -a
+      - name: Resolve duplicate OAF package definitions
+        working-directory: openwrt
+        run: |
+          # DIY provides both appfilter and kmod-oaf; do not scan the feed copy.
+          test -f package/custom/OpenAppFilter/oaf/Makefile
+          test -f package/custom/OpenAppFilter/open-app-filter/Makefile
+          if [ -L package/feeds/packages/open-app-filter ]; then
+            mv package/feeds/packages/open-app-filter "$RUNNER_TEMP/open-app-filter-feed-link"
+          fi
       - name: Configure and check
         working-directory: openwrt
         run: |

@@ -31,6 +31,7 @@ def required_symbols(seed):
         'rtp2httpd': ('rtp2httpd',),
         'ddns-go': ('ddns-go',),
         'upnp': ('miniupnpd-nftables',),
+        'oaf': ('appfilter', 'kmod-oaf'),
     }.items():
         if seed.get('PACKAGE_luci-app-' + app) == 'y':
             required.add('PACKAGE_luci-app-' + app)
