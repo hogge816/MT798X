@@ -107,8 +107,13 @@ git clone --depth=1 https://github.com/Tokisaki-Galaxy/luci-app-tailscale-commun
 
 # 主题
 git clone --depth=1 -b openwrt-25.12 https://github.com/sbwml/luci-theme-argon.git package/custom/luci-theme-argon
-git clone --depth=1 https://github.com/anothaDev/luci-theme-vantage.git package/custom/luci-theme-vantage
-git clone --depth=1 https://github.com/anothaDev/luci-app-vantage.git /package/custom/luci-app-vantage
+# Vantage 主题与 LuCI 应用位于同一个仓库
+VANTAGE_DIR="package/custom/vantage-src"
+rm -rf "$VANTAGE_DIR" package/custom/luci-theme-vantage package/custom/luci-app-vantage
+git clone --depth=1 https://github.com/anothaDev/luci-theme-vantage.git "$VANTAGE_DIR"
+mv "$VANTAGE_DIR/luci-theme-vantage" package/custom/luci-theme-vantage
+mv "$VANTAGE_DIR/luci-app-vantage" package/custom/luci-app-vantage
+rm -rf "$VANTAGE_DIR"
 git clone --depth=1 https://github.com/eamonxg/luci-theme-aurora.git package/custom/luci-theme-aurora
 git clone --depth=1 https://github.com/eamonxg/luci-app-aurora-config.git package/custom/luci-app-aurora-config
 
